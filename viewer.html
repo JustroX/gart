@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Gen Art</title>
+	<script type="text/javascript" src="gart.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var canvas = document.createElement('canvas');
+
+		canvas.id = "main";
+		canvas.width = 1024;
+		canvas.height = 648;
+		canvas.style.border = "1px solid";
+
+		document.body.appendChild(canvas);
+
+		var gart = new Gart(
+			{
+				canvas: canvas,
+				fps: 10,
+			},
+			(g)=>
+			{
+				let a = g.addParticle(
+				{ x: 500, vy: 1 , r:5,
+				 behaviors:
+				 [
+				 	(o)=>
+				 	{
+
+				 	}
+				 ]
+				}
+				);
+			}
+		);
+		gart.start();
+
+	</script>
+</body>
+</html>
