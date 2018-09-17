@@ -3,6 +3,7 @@
 <head>
 	<title>Gen Art</title>
 	<script type="text/javascript" src="gart.js"></script>
+	<script type="text/javascript" src="assets.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
@@ -12,30 +13,53 @@
 		canvas.width = 1024;
 		canvas.height = 648;
 		canvas.style.border = "1px solid";
+		canvas.style.backgroundColor ="#000000";
 
 		document.body.appendChild(canvas);
 
 		var gart = new Gart(
 			{
 				canvas: canvas,
-				fps: 10,
-			},
-			(g)=>
-			{
-				let a = g.addParticle(
-				{ x: 500, vy: 1 , r:5,
-				 behaviors:
-				 [
-				 	(o)=>
-				 	{
-
-				 	}
-				 ]
+				fps: 60,
+				modules: ["GArt_default"],
+				animate: true,
+				oncreate: (g)=>
+				{			
+					let a = g.addParticle("fractal",{
+						x:500,
+						y:250,
+						lifetime: 0,
+						behavior_ops:
+						{
+							frequency: 3,
+							distance: 30,
+							max_gen: 3,
+							newF: (o,i,f,gen) =>
+							{
+								return f+10;
+							},
+							newD: (o,i,d,gen)=>
+							{
+								return d*2.1;
+							},
+							genesis: (o, gen,i) =>
+							{
+								o.stroke = g.getStyleHSL(120*i/o.behavior_ops.frequency,100,50*(3-gen+1)/3);
+								o.vx = 1*Math.cos(o.behavior_ops.direction);
+								o.vy = 1*Math.sin(o.behavior_ops.direction);
+							}
+						},
+						onstep: (o)=>
+						{
+							o.pull(0.0001);
+						}
+					});
+				},
+				onstep: (g)=>
+				{
 				}
-				);
 			}
 		);
-		gart.start();
 
 	</script>
 </body>
