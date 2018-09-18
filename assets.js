@@ -4,8 +4,9 @@ var particles  =
 	{
 		x: 500 ,
 		y: 500 ,
-		r: 100,
-		style: "yellow",
+		r: 5,
+		style: "white",
+		stroke: "rgba(0,0,0,0)"
 	},
 	"fractal":
 	{
@@ -98,6 +99,15 @@ var behaviors =
 				if(on_genesis) on_genesis(a,gen+1,i);
 			}
 		},1);
+	},
+	spiral : (o) =>
+	{
+		let ops = o.behavior_ops;
+		ops.v = ops.v || 0.0003;
+		ops.direction = (ops.direction + ops.omega ) || 0;
+		o.vx = ops.v*Math.cos(ops.direction);
+		o.vy = ops.v*Math.sin(ops.direction);
+
 	}
 }
 

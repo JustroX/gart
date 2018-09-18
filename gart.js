@@ -121,6 +121,7 @@ class Particle
 		this.draw = p.draw || this.draw;
 		this.onstep = p.onstep || ((g)=>{});
 		this.lifetime = p.lifetime || -1;
+		this.flat_a = [ this.ax + 0 , this.ay + 0  ];
 
 		for(let i in p)
 		{
@@ -128,10 +129,18 @@ class Particle
 				this[i] = p[i];
 		}
 		this.behaviors = p.behaviors || [];
+
+		for(let i of this.behaviors)
+			if(typeof i == 'string')
+				this.behaviors[i] = this.parent.getBehavior(i);
 	}
 
 	step(t)
 	{
+		// // console.log(this.flat_a[0]+" "+this.ax);
+		this.ax = 0+  this.flat_a[0];
+		this.ay = 0+  this.flat_a[1];
+
 		for(let i of this.behaviors)
 		{
 			if(typeof i == "string")
@@ -139,6 +148,7 @@ class Particle
 			else
 			i(this,this.parent);
 		}
+		this.onstep(this);
 
 		this.vx += this.ax;
 		this.vy += this.ay;
@@ -147,7 +157,6 @@ class Particle
 		this.r = Math.max(0,this.r);
 		this.time++;
 
-		this.onstep(this);
 
 		if( this.lifetime >0 && this.time >= this.lifetime)
 			this.destroy();
@@ -175,8 +184,40 @@ class Particle
 				}
 			}
 		}
-		this.ax = sx;
-		this.ay = sy;
+		this.ax += sx;
+		this.ay += sy;
+	}
+
+	exclusion(mag, dist,c, tag)
+	{
+		if(!this.parent) return;
+		let sx = 0, sy = 0;
+		for(let i of this.parent.particles)
+		{
+			// console.log(mag);
+			
+			if(i.tags.includes(tag) || !tag )
+			{
+				let dx = i.x - this.x;
+				let dy = i.y - this.y;
+				// console.log(dx);
+				let d = Math.sqrt(dx*dx + dy*dy);
+
+				let m = mag;
+				if( d <= dist )
+					m = -mag*c;
+				else
+					m = mag;
+
+				if(d!=0)
+				{
+					sx += m*dx/d;
+					sy += m*dy/d;
+				}
+			}
+		}
+		this.ax += sx;
+		this.ay += sy;	
 	}
 
 	destroy()
@@ -236,9 +277,13 @@ class GModule
 		a.behaviors = this.particles[n].behaviors; 
 		for(let i in ops)
 		{
-			if(typeof ops[i] == 'object')
+			if(typeof ops[i] == 'object' && !Array.isArray(ops[i]))
+			{
+				if(!a[i])
+					a[i] = {};
 				for(let j in ops[i])
 					a[i][j] = ops[i][j];
+			}
 			else
 					a[i] = ops[i];
 		}
