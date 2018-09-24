@@ -285,6 +285,14 @@ class GModule
 					a[i][j] = ops[i][j];
 			}
 			else
+			if(typeof ops[i] == 'object' && Array.isArray(ops[i]))
+			{
+				if(!a[i])
+					a[i] = [];
+				for(let j in ops[i])
+					a[i].push(ops[i][j]);
+			}
+			else
 					a[i] = ops[i];
 		}
 		return a;

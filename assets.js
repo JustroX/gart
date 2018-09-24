@@ -51,7 +51,8 @@ var behaviors =
 		let d = ops.distance;
 		let f = ops.frequency;
 		let def = ((o_,i)=>{
-			let angle = (ops.newDirection && ops.newDirection(o_,i,direction,gen)) || (((gen == 0)? 2: 1) * ( i - (f-1)/2  )*Math.PI / f + direction);
+			let angle = (ops.newDirection && ops.newDirection(o_,i,direction,gen)  ) ;
+			if(!angle && angle!=0) angle =  (((gen == 0)? 2: 1) * ( i - (f-1)/2  )*Math.PI / f + direction);
 			let a = {
 				x : ( ops.newX && ops.newX(o_,i,o,gen.x,angle) ) || (o.x + d*Math.cos(angle)),
 				y : ( ops.newY && ops.newY(o_,i,o,gen.y,angle) ) || (o.y + d*Math.sin(angle)),
@@ -66,6 +67,7 @@ var behaviors =
 					max_gen: max_gen,
 					frequency: ( ops.newF && ops.newF(o_,i,f,gen,angle) ) || f,
 					genesis: ops.genesis,
+					delay : ( ops.newDelay && ops.newDelay(o_,i,f,gen,angle) ) || ops.delay,
 
 					newX: ops.newX,
 					newY: ops.newY,
@@ -73,7 +75,7 @@ var behaviors =
 					newDirection: ops.newDirection,
 					newD: ops.newD,
 					newF: ops.newF,
-				}
+				},
 			}
 			return a;
 		});
@@ -98,7 +100,7 @@ var behaviors =
 				let a = g.addParticle(g.getParticle( o.id , old_vals));
 				if(on_genesis) on_genesis(a,gen+1,i);
 			}
-		},1);
+		},ops.delay || 1);
 	},
 	spiral : (o) =>
 	{
@@ -107,7 +109,13 @@ var behaviors =
 		ops.direction = (ops.direction + ops.omega ) || 0;
 		o.vx = ops.v*Math.cos(ops.direction);
 		o.vy = ops.v*Math.sin(ops.direction);
-
+	},
+	moving_body: (o)=>
+	{
+		let ops = o.behavior_ops;
+		ops.v = ops.v || 0.0003;
+		o.vx = ops.v*Math.cos(ops.direction);
+		o.vy = ops.v*Math.sin(ops.direction);
 	}
 }
 
